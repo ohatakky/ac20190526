@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 	"strconv"
 )
 
@@ -53,13 +54,75 @@ func readFloat64() float64 {
 	}
 	return f
 }
+
+type Restaurat struct {
+	index int
+	City  string
+	Point int
+}
+
+type Restaurats []Restaurat
+
+func (r Restaurats) Len() int {
+	return len(r)
+}
+
+func (r Restaurats) Swap(i, j int) {
+	r[i], r[j] = r[j], r[i]
+}
+
+type ByCity struct {
+	Restaurats
+}
+
+func (b ByCity) Less(i, j int) bool {
+	// fmt.Println(b.Restaurats[i].City == b.Restaurats[j].City)
+	return b.Restaurats[i].City < b.Restaurats[j].City
+}
+
+type ByPoint struct {
+	Restaurats
+}
+
+func (b ByPoint) Less(i, j int) bool {
+	return b.Restaurats[i].Point > b.Restaurats[j].Point
+}
+
+type ByCityByPoint struct {
+	Restaurats
+}
+
+func (b ByCityByPoint) Less(i, j int) bool {
+	if b.Restaurats[i].Point > b.Restaurats[j].Point {
+		return b.Restaurats[i].City <= b.Restaurats[j].City
+	}
+	return b.Restaurats[i].City < b.Restaurats[j].City
+}
+
 func main() {
-	a := readInt()
-	p := readInt()
+	n := readInt()
+	restaurants := make(Restaurats, n)
 
-	apple := 3*a + p
+	for i := 0; i < n; i++ {
+		restaurants[i].index = i + 1
+		restaurants[i].City = readString()
+		restaurants[i].Point = readInt()
+	}
 
-	pie := apple / 2
+	// sort.Sort(ByPoint{restaurants})
+	// sort.Sort(ByCity{restaurants})
+	sort.Sort(ByCityByPoint{restaurants})
 
-	fmt.Println(pie)
+	// sort.Slice(restaurants, func(i, j int) bool {
+	// 	p, q := restaurants[i], restaurants[j]
+	// 	if p.Point > q.Point {
+	// 		return p.City <= q.City
+	// 	}
+	// 	return false
+	// })
+
+	for i := 0; i < n; i++ {
+		// fmt.Println(restaurants[i].index)
+		fmt.Println(restaurants[i].index)
+	}
 }
